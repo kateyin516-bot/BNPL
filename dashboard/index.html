@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BNPL / 豆分期经营看板</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">B</div>
+          <div>
+            <strong>BNPL</strong>
+            <span>豆分期经营看板</span>
+          </div>
+        </div>
+        <nav class="nav-list" aria-label="看板模块">
+          <button class="nav-item active" data-section="overview">经营总览</button>
+          <button class="nav-item" data-section="funnel">业务漏斗</button>
+          <button class="nav-item" data-section="loan">贷款放款</button>
+          <button class="nav-item" data-section="quality">资产质量</button>
+          <button class="nav-item" data-section="merchant">渠道产品</button>
+          <button class="nav-item" data-section="detail">底层明细</button>
+        </nav>
+        <div class="source-box">
+          <span>数据快照</span>
+          <strong>2026-06-03</strong>
+          <small>主表：dws_mof_loan_wide_daily</small>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">人民币口径 · 黑色金融科技风 · 可下钻</p>
+            <h1>BNPL / 豆分期经营看板</h1>
+          </div>
+          <div class="filters" aria-label="全局筛选">
+            <label>
+              <span>时间颗粒度</span>
+              <select id="grainSelect">
+                <option value="day">日</option>
+                <option value="week">周</option>
+                <option value="month" selected>月</option>
+                <option value="quarter">季度</option>
+                <option value="year">年</option>
+              </select>
+            </label>
+            <label>
+              <span>产品分组</span>
+              <select id="groupSelect">
+                <option value="ALL" selected>全部 BNPL</option>
+                <option value="RMB_BNPL">人民币 BNPL</option>
+                <option value="USD_BNPL">美金 BNPL</option>
+              </select>
+            </label>
+            <label>
+              <span>业务名称</span>
+              <select id="brandSelect">
+                <option value="ALL" selected>全部</option>
+                <option value="doubei">豆呗</option>
+                <option value="doufenqi">豆分期</option>
+              </select>
+            </label>
+          </div>
+        </header>
+
+        <section id="overview" class="section active-section">
+          <div class="section-head">
+            <div>
+              <h2>经营总览</h2>
+              <p>金额统一折人民币，153 为人民币 BNPL，157/187 为美金 BNPL。</p>
+            </div>
+            <button class="ghost-btn" data-detail="overview">查看口径</button>
+          </div>
+          <div class="kpi-grid" id="kpiGrid"></div>
+          <div class="panel-grid two">
+            <article class="panel">
+              <div class="panel-title">
+                <h3>放款金额趋势</h3>
+                <button class="icon-btn" data-detail="trend" title="查看底层数据">↗</button>
+              </div>
+              <canvas id="trendCanvas" width="900" height="320" aria-label="放款金额趋势"></canvas>
+            </article>
+            <article class="panel">
+              <div class="panel-title">
+                <h3>产品贡献</h3>
+                <button class="icon-btn" data-detail="product" title="查看底层数据">↗</button>
+              </div>
+              <div id="productBars" class="bar-list"></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="funnel" class="section">
+          <div class="section-head">
+            <div>
+              <h2>BNPL 业务漏斗</h2>
+              <p>用户、申请、授信、放款的基础链路已通过主宽表验证。</p>
+            </div>
+            <button class="ghost-btn" data-detail="funnel">查看 SQL</button>
+          </div>
+          <div class="funnel" id="funnelChart"></div>
+        </section>
+
+        <section id="loan" class="section">
+          <div class="section-head">
+            <div>
+              <h2>贷款与放款分析</h2>
+              <p>放款发生口径使用 loan_start_date，当前余额使用最新 dt 快照。</p>
+            </div>
+            <button class="ghost-btn" data-detail="loan">查看口径</button>
+          </div>
+          <div class="panel-grid two">
+            <article class="panel">
+              <div class="panel-title"><h3>状态分布</h3></div>
+              <div id="statusTable" class="table-wrap"></div>
+            </article>
+            <article class="panel">
+              <div class="panel-title"><h3>渠道 Top</h3></div>
+              <div id="channelTable" class="table-wrap"></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="quality" class="section">
+          <div class="section-head">
+            <div>
+              <h2>还款与资产质量</h2>
+              <p>资产质量优先使用飞书多维表格，字段包含 M1、M1+、M3+、回款率和人民币金额。</p>
+            </div>
+            <button class="ghost-btn" data-detail="quality">查看飞书来源</button>
+          </div>
+          <div class="quality-grid" id="qualityGrid"></div>
+        </section>
+
+        <section id="merchant" class="section">
+          <div class="section-head">
+            <div>
+              <h2>渠道产品</h2>
+              <p>用于拆分产品 153、157、187，以及渠道/销售维度。</p>
+            </div>
+            <button class="ghost-btn" data-detail="merchant">查看字段</button>
+          </div>
+          <div class="panel">
+            <div id="productTable" class="table-wrap"></div>
+          </div>
+        </section>
+
+        <section id="detail" class="section">
+          <div class="section-head">
+            <div>
+              <h2>底层数据明细</h2>
+              <p>这里展示当前选中指标的字段、来源、筛选条件和样例记录。</p>
+            </div>
+          </div>
+          <div class="panel">
+            <div id="detailLanding" class="detail-landing"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <aside class="drawer" id="drawer" aria-hidden="true">
+      <div class="drawer-card">
+        <div class="drawer-head">
+          <div>
+            <span class="eyebrow">Drill Down</span>
+            <h3 id="drawerTitle">底层数据</h3>
+          </div>
+          <button class="close-btn" id="closeDrawer" aria-label="关闭">×</button>
+        </div>
+        <div id="drawerBody"></div>
+      </div>
+    </aside>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
